@@ -2124,6 +2124,29 @@ AG_GST_CHECK_FEATURE(SNDIO, [sndio audio], sndio, [
   fi
 ])
 
+dnl *** Werbrtc ***
+translit(dnm, m, l) AM_CONDITIONAL(USE_WEBRTC, true)
+AG_GST_CHECK_FEATURE(WEBRTC, [webrtc], webrtc, [
+  AC_CHECK_HEADER(srtp.h, HAVE_SRTP="yes", HAVE_SNDIO="no")
+  PKG_CHECK_MODULES(WEBRTC, nice >= 0.1.3, [
+    AC_CHECK_HEADER(srtp/srtp.h, [
+      AC_CHECK_LIB(srtp, srtp_init, [
+        WEBRTC_LIBS="$WEBRTC_LIBS -lsrtp"
+        HAVE_WEBRTC="yes"
+      ], [
+        HAVE_WEBRTC="no"
+        ])
+      ], [
+        HAVE_WEBRTC="no"
+      ])
+  ], [
+    HAVE_WEBRTC="no"
+  ])
+
+  AC_SUBST(WEBRTC_CFLAGS)
+  AC_SUBST(WEBRTC_LIBS)
+])
+
 else
 
 dnl not building plugins with external dependencies,
@@ -2196,6 +2219,7 @@ AM_CONDITIONAL(USE_RTMP, false)
 AM_CONDITIONAL(USE_TELETEXTDEC, false)
 AM_CONDITIONAL(USE_SNDIO, false)
 AM_CONDITIONAL(USE_UVCH264, false)
+AM_CONDITIONAL(USE_WEBRTC, false)
 
 fi dnl of EXT plugins
 
@@ -2341,6 +2365,7 @@ gst/videomeasure/Makefile
 gst/videoparsers/Makefile
 gst/videosignal/Makefile
 gst/vmnc/Makefile
+gst/webrtc/Makefile
 gst/y4m/Makefile
 gst/yadif/Makefile
 gst-libs/Makefile
